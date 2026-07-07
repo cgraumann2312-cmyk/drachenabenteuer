@@ -756,9 +756,19 @@ document.getElementById("restartBtn").addEventListener("click", () => {
 });
 
 /* ---------- Sprachausgabe: vorgenerierte Audiodateien + Web Speech API Fallback ---------- */
-// Diese Szenen enthalten den {companions}-Platzhalter, der je nach Spielverlauf
-// unterschiedlich ist - dafür gibt es keine vorgenerierte Audiodatei, sie nutzen live TTS.
-const noAudioNodes = new Set(["ende_schloss", "ende_turm", "ende_drache"]);
+// Die drei Enden enthalten den {companions}-Platzhalter. Da es davon nur 12 mögliche
+// Kombinationen gibt (Fu immer dabei, Ritter Finn ODER Magier Alderan, optional Hexe Morla
+// ODER Fee Lumi), gibt es für jede Kombination eine eigene vorgenerierte Audiodatei.
+const dynamicEndings = new Set(["ende_schloss", "ende_turm", "ende_drache"]);
+
+function endingAudioFile(nodeId){
+  const sideQuest = companions.includes("Hexe Morla") ? "hexe" : companions.includes("Fee Lumi") ? "fee" : "none";
+  if(nodeId === "ende_drache"){
+    const ally = companions.includes("Ritter Finn") ? "schloss" : "turm";
+    return `${nodeId}_${sideQuest}_${ally}.mp3`;
+  }
+  return `${nodeId}_${sideQuest}.mp3`;
+}
 
 const storyAudio = document.getElementById("storyAudio");
 let germanVoices = [];
@@ -810,12 +820,9 @@ document.getElementById("rateSlider").addEventListener("input", e => {
 
 function narrate(nodeId, text){
   storyAudio.pause();
-  if(noAudioNodes.has(nodeId)){
-    speak(text);
-    return;
-  }
+  const fileName = dynamicEndings.has(nodeId) ? endingAudioFile(nodeId) : nodeId + ".mp3";
   storyAudio.onerror = () => speak(text); // Fallback, falls die Audiodatei fehlt/nicht lädt
-  storyAudio.src = "audio/" + nodeId + ".mp3";
+  storyAudio.src = "audio/" + fileName;
   storyAudio.playbackRate = speechRate;
   storyAudio.play().catch(() => speak(text));
 }
