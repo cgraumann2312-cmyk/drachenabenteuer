@@ -360,6 +360,8 @@
   </div>
 </div>
 
+<audio id="storyAudio" preload="none"></audio>
+
 <script>
 /* ---------- Story ---------- */
 const story = {
@@ -704,7 +706,7 @@ function renderScene(nodeId){
   renderMap(node.mapStop);
 
   if(autoRead){
-    speak(document.getElementById("sceneText").textContent);
+    narrate(nodeId, document.getElementById("sceneText").textContent);
   }
 }
 
@@ -753,7 +755,12 @@ document.getElementById("restartBtn").addEventListener("click", () => {
   renderScene("start");
 });
 
-/* ---------- Sprachausgabe (Web Speech API) ---------- */
+/* ---------- Sprachausgabe: vorgenerierte Audiodateien + Web Speech API Fallback ---------- */
+// Diese Szenen enthalten den {companions}-Platzhalter, der je nach Spielverlauf
+// unterschiedlich ist - dafür gibt es keine vorgenerierte Audiodatei, sie nutzen live TTS.
+const noAudioNodes = new Set(["ende_schloss", "ende_turm", "ende_drache"]);
+
+const storyAudio = document.getElementById("storyAudio");
 let germanVoices = [];
 let selectedVoice = null;
 let speechRate = 1.0;
@@ -798,7 +805,20 @@ document.getElementById("voiceSelect").addEventListener("change", e => {
 
 document.getElementById("rateSlider").addEventListener("input", e => {
   speechRate = parseFloat(e.target.value);
+  storyAudio.playbackRate = speechRate;
 });
+
+function narrate(nodeId, text){
+  storyAudio.pause();
+  if(noAudioNodes.has(nodeId)){
+    speak(text);
+    return;
+  }
+  storyAudio.onerror = () => speak(text); // Fallback, falls die Audiodatei fehlt/nicht lädt
+  storyAudio.src = "audio/" + nodeId + ".mp3";
+  storyAudio.playbackRate = speechRate;
+  storyAudio.play().catch(() => speak(text));
+}
 
 function speak(text){
   if(!("speechSynthesis" in window)) return;
@@ -837,7 +857,7 @@ autoReadBtn.addEventListener("click", () => {
 });
 
 document.getElementById("readNowBtn").addEventListener("click", () => {
-  speak(story[currentNode].text);
+  narrate(currentNode, document.getElementById("sceneText").textContent);
 });
 
 /* ---------- Start ---------- */
