@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emmas &amp; Pias Drachenabenteuer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --wood-dark:#6b4327;
+    --wood-mid:#8b5a2b;
+    --wood-light:#a9723c;
+    --parchment:#f4e8d0;
+    --parchment-shadow:#e2cfa3;
+    --ink:#4a3423;
+    --accent:#e8792c;
+    --accent-dark:#c85f1a;
+    --accent2:#3f9d6b;
+    --accent2-dark:#2f7d52;
+    --sky-top:#0b1230;
+    --sky-bottom:#1c2a5e;
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{
+    margin:0;
+    min-height:100%;
+    font-family:'Quicksand',sans-serif;
+    color:var(--ink);
+  }
+
+  body{
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px 12px;
+    overflow-x:hidden;
+    background:radial-gradient(ellipse at 50% -10%, var(--sky-bottom), var(--sky-top) 70%);
+    background-attachment:fixed;
+  }
+
+  /* Sternenhimmel */
+  body::before, body::after{
+    content:"";
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    pointer-events:none;
+    background-repeat:repeat;
+    z-index:0;
+  }
+  body::before{
+    background-image:
+      radial-gradient(2px 2px at 10% 20%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 30% 65%, #fff, transparent),
+      radial-gradient(2px 2px at 50% 15%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 70% 40%, #fff, transparent),
+      radial-gradient(2px 2px at 85% 75%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 15% 85%, #fff, transparent),
+      radial-gradient(2px 2px at 95% 25%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 60% 90%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 40% 40%, #fff, transparent);
+    background-size:100% 100%;
+    opacity:0.8;
+    animation:twinkle 4s ease-in-out infinite alternate;
+  }
+  body::after{
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, #cfe0ff, transparent),
+      radial-gradient(1px 1px at 45% 55%, #cfe0ff, transparent),
+      radial-gradient(1px 1px at 65% 20%, #cfe0ff, transparent),
+      radial-gradient(1px 1px at 80% 60%, #cfe0ff, transparent),
+      radial-gradient(1px 1px at 25% 75%, #cfe0ff, transparent),
+      radial-gradient(1px 1px at 90% 90%, #cfe0ff, transparent);
+    background-size:100% 100%;
+    opacity:0.6;
+    animation:twinkle 3s ease-in-out infinite alternate-reverse;
+  }
+  @keyframes twinkle{
+    from{opacity:0.4;}
+    to{opacity:0.9;}
+  }
+
+  .book{
+    position:relative;
+    z-index:1;
+    width:100%;
+    max-width:640px;
+    background:
+      repeating-linear-gradient(45deg, var(--wood-mid) 0 8px, var(--wood-dark) 8px 16px);
+    border-radius:26px;
+    padding:16px;
+    box-shadow:
+      0 20px 50px rgba(0,0,0,0.55),
+      inset 0 0 0 6px var(--wood-light),
+      inset 0 0 0 10px var(--wood-dark);
+  }
+
+  .page{
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(255,255,255,0.35), transparent 60%),
+      radial-gradient(ellipse at 80% 90%, rgba(0,0,0,0.05), transparent 60%),
+      var(--parchment);
+    border-radius:16px;
+    padding:22px 22px 16px;
+    box-shadow:
+      inset 0 0 0 2px var(--parchment-shadow),
+      inset 0 0 30px rgba(139,90,43,0.15);
+  }
+
+  h1{
+    font-family:'Baloo 2', cursive;
+    font-size:1.6rem;
+    text-align:center;
+    margin:0 0 4px;
+    color:var(--accent-dark);
+    text-shadow:1px 1px 0 rgba(255,255,255,0.4);
+  }
+
+  .subtitle{
+    text-align:center;
+    font-size:0.85rem;
+    margin:0 0 16px;
+    color:var(--wood-dark);
+    font-weight:600;
+    opacity:0.8;
+  }
+
+  .scene{
+    background:rgba(255,255,255,0.35);
+    border:2px dashed var(--wood-light);
+    border-radius:14px;
+    padding:18px;
+    text-align:center;
+    min-height:160px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+  }
+
+  .scene-icon{
+    font-size:3rem;
+    line-height:1;
+  }
+
+  .scene-text{
+    font-size:1.15rem;
+    font-weight:600;
+    line-height:1.5;
+    margin:0;
+  }
+
+  .choices{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    justify-content:center;
+    margin-top:18px;
+  }
+
+  .choice-btn{
+    font-family:'Baloo 2', cursive;
+    font-size:1.05rem;
+    font-weight:700;
+    color:#fff;
+    background:linear-gradient(180deg, var(--accent), var(--accent-dark));
+    border:none;
+    border-radius:14px;
+    padding:14px 22px;
+    cursor:pointer;
+    box-shadow:0 4px 0 var(--accent-dark), 0 6px 12px rgba(0,0,0,0.3);
+    transition:transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .choice-btn:hover{ transform:translateY(-2px); }
+  .choice-btn:active{
+    transform:translateY(2px);
+    box-shadow:0 2px 0 var(--accent-dark), 0 3px 6px rgba(0,0,0,0.3);
+  }
+  .choice-btn:nth-child(2n){
+    background:linear-gradient(180deg, var(--accent2), var(--accent2-dark));
+    box-shadow:0 4px 0 var(--accent2-dark), 0 6px 12px rgba(0,0,0,0.3);
+  }
+  .choice-btn:nth-child(2n):active{
+    box-shadow:0 2px 0 var(--accent2-dark), 0 3px 6px rgba(0,0,0,0.3);
+  }
+
+  .type-area{
+    margin-top:16px;
+    display:flex;
+    gap:8px;
+  }
+  .type-area input{
+    flex:1;
+    font-family:'Quicksand',sans-serif;
+    font-size:1rem;
+    font-weight:600;
+    padding:10px 14px;
+    border-radius:12px;
+    border:2px solid var(--wood-light);
+    background:#fffdf6;
+  }
+  .type-area button{
+    font-family:'Baloo 2', cursive;
+    font-weight:700;
+    border:none;
+    border-radius:12px;
+    padding:10px 18px;
+    background:linear-gradient(180deg, var(--wood-light), var(--wood-dark));
+    color:#fff;
+    cursor:pointer;
+  }
+  .type-hint{
+    text-align:center;
+    font-size:0.8rem;
+    margin-top:6px;
+    min-height:1.1em;
+    color:var(--wood-dark);
+    font-style:italic;
+  }
+
+  .restart-btn{
+    display:block;
+    margin:18px auto 0;
+    font-family:'Baloo 2', cursive;
+    font-weight:700;
+    font-size:1rem;
+    color:#fff;
+    background:linear-gradient(180deg, var(--accent), var(--accent-dark));
+    border:none;
+    border-radius:14px;
+    padding:12px 24px;
+    cursor:pointer;
+    box-shadow:0 4px 0 var(--accent-dark);
+  }
+
+  /* Sprachsteuerung */
+  .speech-panel{
+    margin-top:18px;
+    padding:12px 14px;
+    background:rgba(255,255,255,0.4);
+    border-radius:14px;
+    border:2px solid var(--wood-light);
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    justify-content:center;
+    font-size:0.85rem;
+  }
+  .speech-panel button{
+    font-family:'Baloo 2', cursive;
+    font-weight:700;
+    font-size:0.9rem;
+    border:none;
+    border-radius:10px;
+    padding:8px 14px;
+    cursor:pointer;
+    color:#fff;
+    background:linear-gradient(180deg, var(--wood-light), var(--wood-dark));
+  }
+  .speech-panel button.active{
+    background:linear-gradient(180deg, var(--accent2), var(--accent2-dark));
+  }
+  .speech-panel select, .speech-panel input[type=range]{
+    font-family:'Quicksand',sans-serif;
+    font-weight:600;
+  }
+  .speech-panel label{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-weight:600;
+    color:var(--wood-dark);
+  }
+  .speech-panel select{
+    max-width:150px;
+    padding:4px;
+    border-radius:8px;
+    border:1px solid var(--wood-light);
+  }
+
+  /* Fortschritts-Landkarte */
+  .map{
+    margin-top:18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:4px;
+  }
+  .map-stop{
+    flex:1;
+    text-align:center;
+    font-size:1.1rem;
+    opacity:0.3;
+    filter:grayscale(1);
+    transition:opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;
+    position:relative;
+  }
+  .map-stop.done{
+    opacity:1;
+    filter:none;
+    transform:scale(1.15);
+  }
+  .map-stop span{
+    display:block;
+    font-size:0.5rem;
+    font-weight:700;
+    color:var(--wood-dark);
+    margin-top:2px;
+    white-space:nowrap;
+  }
+
+  @media (max-width:420px){
+    h1{ font-size:1.3rem; }
+    .scene-text{ font-size:1.02rem; }
+    .map-stop span{ font-size:0.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="book">
+  <div class="page">
+    <h1>🐉 Emmas &amp; Pias Drachenabenteuer</h1>
+    <p class="subtitle">Ein Abenteuer zum Klicken und Mitlesen</p>
+
+    <div class="scene">
+      <div class="scene-icon" id="sceneIcon">🗺️</div>
+      <p class="scene-text" id="sceneText">Lädt...</p>
+    </div>
+
+    <div class="choices" id="choices"></div>
+
+    <div class="type-area" id="typeArea">
+      <input type="text" id="typeInput" placeholder="...oder hier tippen" autocomplete="off">
+      <button id="typeSubmit">Los!</button>
+    </div>
+    <p class="type-hint" id="typeHint"></p>
+
+    <button class="restart-btn" id="restartBtn" style="display:none;">🔄 Nochmal von vorne</button>
+
+    <div class="speech-panel">
+      <button id="autoReadBtn">🔊 Vorlesen: an</button>
+      <button id="readNowBtn">🔁 Diese Seite vorlesen</button>
+      <label>Stimme:
+        <select id="voiceSelect"><option>lädt...</option></select>
+      </label>
+      <label>Tempo:
+        <input type="range" id="rateSlider" min="0.6" max="1.3" step="0.1" value="1">
+      </label>
+    </div>
+
+    <div class="map" id="map"></div>
+  </div>
+</div>
+
+<script>
+/* ---------- Story ---------- */
+const story = {
+  start: {
+    icon: "🗺️",
+    mapStop: 0,
+    text: "Emma und Pia spielen im Garten, als Pia zwischen den Blumen etwas Glitzerndes findet: eine alte, verknitterte Schatzkarte! Sie zeigt einen langen Weg durch einen verwunschenen Wald, vorbei an einem Schloss und einem Zauberturm, über einen Fluss und durch eine dunkle Höhle bis zu einer Drachenhöhle. Ganz am Ende ist ein großes X eingezeichnet - dort wartet ein Schatz.",
+    choices: [
+      { label: "🔍 Die Karte genau ansehen", keywords: ["karte", "ansehen", "schauen"], next: "weg_wahl" },
+      { label: "🎒 Voller Vorfreude losrennen", keywords: ["los", "start", "abenteuer", "ja", "rennen"], next: "weg_wahl" }
+    ]
+  },
+
+  weg_wahl: {
+    icon: "🧭",
+    mapStop: 1,
+    text: "Die Karte zeigt zwei Wege zum Start: einen schattigen Pfad in den verwunschenen Wald und einen sonnigen Weg über die bunte Wiese. Welchen Weg wollen Emma und Pia nehmen?",
+    choices: [
+      { label: "🌲 In den Wald", keywords: ["wald", "bäume", "baum", "schatten", "verwunschen"], next: "wald" },
+      { label: "🌻 Über die Wiese", keywords: ["wiese", "blumen", "sonne", "schmetterling"], next: "wiese" }
+    ]
+  },
+
+  wald: {
+    icon: "🌲✨",
+    mapStop: 1,
+    text: "Im verwunschenen Wald wird es zwischen den knorrigen Bäumen schnell dunkler. Kleine, glitzernde Lichter tanzen zwischen den Ästen - Irrlichter! Sie flackern verlockend zur Seite, während der breite Hauptpfad einfach geradeaus weiterführt.",
+    choices: [
+      { label: "✨ Den Lichtern folgen", keywords: ["lichter", "folgen", "licht", "irrlicht"], next: "hexenhuette" },
+      { label: "➡️ Dem Pfad folgen", keywords: ["pfad", "weiter", "hauptweg", "geradeaus"], next: "wegkreuzung" }
+    ]
+  },
+
+  wiese: {
+    icon: "🦋",
+    mapStop: 1,
+    text: "Auf der Wiese tanzen bunte Schmetterlinge um Emma und Pia herum. Einer davon glitzert seltsam golden und flattert immer wieder zu einem Kreis aus Kleeblättern, während Emma in der Ferne schon ein Schloss auf einem Hügel und einen spitzen Turm im Nebel entdeckt.",
+    choices: [
+      { label: "🦋 Dem goldenen Schmetterling folgen", keywords: ["schmetterling", "folgen", "golden", "fangen"], next: "wiese_fee" },
+      { label: "➡️ Direkt weiterlaufen", keywords: ["weiter", "direkt", "laufen", "kreuzung"], next: "wegkreuzung" }
+    ]
+  },
+
+  wiese_fee: {
+    icon: "🧚",
+    mapStop: 1,
+    text: "Mitten im Kleeblatt-Kreis sitzt eine winzige Fee mit glitzernden Flügeln - Fee Lumi! \"Na, wer besucht mich denn da?\", kichert sie und hält den beiden ein kleines, vierblättriges Kleeblatt hin, das sanft in ihrer Hand leuchtet.",
+    choices: [
+      { label: "🍀 Das Glücksklee-Blatt annehmen", keywords: ["klee", "kleeblatt", "annehmen", "ja"], next: "wegkreuzung", gain: { companion: "Fee Lumi", item: "kleeblatt" } },
+      { label: "🙅 Höflich ablehnen und weiterziehen", keywords: ["ablehnen", "nein", "weiter"], next: "wegkreuzung" }
+    ]
+  },
+
+  hexenhuette: {
+    icon: "🧙‍♀️",
+    mapStop: 1,
+    text: "Die Lichter führen zu einer schiefen kleinen Hütte mit einem qualmenden Schornstein. Aus dem Fenster hört man ein leises Kichern und das Blubbern eines Kessels.",
+    choices: [
+      { label: "🚪 Mutig anklopfen", keywords: ["anklopfen", "klopfen", "rein", "tür"], next: "hexe_raetsel" },
+      { label: "🙈 Lieber leise weiterschleichen", keywords: ["weiterschleichen", "schleichen", "weiter", "vorbei"], next: "wegkreuzung" }
+    ]
+  },
+
+  hexe_raetsel: {
+    icon: "🔮",
+    mapStop: 1,
+    text: "Die Tür öffnet sich knarrend, und heraus schaut eine alte Frau mit spitzem Hut und freundlichen Augen: die Kräuterhexe Morla. \"Keine Sorge, ich verhexe niemanden!\", lacht sie. \"Aber wer mir kurz hilft, den Kessel umzurühren, bekommt von mir ein kleines Geschenk.\"",
+    choices: [
+      { label: "🥄 Kessel umrühren helfen", keywords: ["kessel", "rühren", "helfen"], next: "hexe_belohnung" },
+      { label: "😅 Höflich ablehnen, wir haben's eilig", keywords: ["ablehnen", "nein", "eilig", "später"], next: "wegkreuzung" }
+    ]
+  },
+
+  hexe_belohnung: {
+    icon: "🎁",
+    mapStop: 1,
+    gain: { companion: "Hexe Morla", item: "leuchtstein" },
+    text: "Gemeinsam rühren Emma und Pia den duftenden Kräutertrank um, bis er sanft grün schimmert. Zum Dank schenkt Morla ihnen einen kleinen Leuchtstein, der in dunklen Ecken hell aufleuchtet. \"Kommt mich jederzeit wieder besuchen!\", ruft sie den beiden fröhlich hinterher.",
+    choices: [
+      { label: "👋 Winken und weiterziehen", keywords: ["winken", "weiter"], next: "wegkreuzung" },
+      { label: "🎶 Ein Abschiedslied summen", keywords: ["lied", "summen", "abschied"], next: "wegkreuzung" }
+    ]
+  },
+
+  wegkreuzung: {
+    icon: "🪧",
+    mapStop: 2,
+    text: "Der Pfad endet an einer alten Wegkreuzung mit einem hölzernen Schild. Ein Pfeil zeigt zu einem stolzen Schloss auf einem grünen Hügel, der andere zu einem hohen Zauberturm, der in silbernen Nebel gehüllt ist.",
+    choices: [
+      { label: "🏰 Zum Schloss", keywords: ["schloss", "ritter", "burg"], next: "schloss" },
+      { label: "🗼 Zum Zauberturm", keywords: ["turm", "zauberer", "magier"], next: "turm" }
+    ]
+  },
+
+  schloss: {
+    icon: "🏰",
+    mapStop: 2,
+    text: "Am großen Schlosstor steht Ritter Finn, ein junger Ritter mit blank poliertem Schild und einem sehr freundlichen Lächeln. \"Halt, wer da kommt!\", ruft er fröhlich - und muss dabei selbst ein bisschen kichern.",
+    choices: [
+      { label: "👋 Freundlich winken", keywords: ["winken", "hallo", "vorstellen"], next: "schloss_ritter" },
+      { label: "🎉 Fröhlich zurückrufen", keywords: ["rufen", "hallo", "fröhlich"], next: "schloss_ritter" }
+    ]
+  },
+
+  schloss_ritter: {
+    icon: "⚔️",
+    mapStop: 2,
+    gain: { companion: "Ritter Finn" },
+    text: "\"Emma und Pia, auf Schatzsuche? Wie aufregend!\", freut sich Ritter Finn. Er zeigt ihnen stolz sein glänzendes Schwert und begleitet sie ein Stück, bevor er ihnen zum Abschied ein kleines silbernes Mut-Abzeichen schenkt.",
+    choices: [
+      { label: "➡️ Weiter zum Fluss", keywords: ["weiter", "fluss"], next: "fluss" },
+      { label: "😄 Noch einmal winken und weiter", keywords: ["winken", "tschüss", "abschied"], next: "fluss" }
+    ]
+  },
+
+  turm: {
+    icon: "🗼",
+    mapStop: 2,
+    text: "Der Zauberturm ragt hoch in den Nebel, eine steinerne Wendeltreppe windet sich nach oben. Aus den Fenstern sprühen kleine bunte Funken, und ein leises, geheimnisvolles Summen liegt in der Luft.",
+    choices: [
+      { label: "🪜 Die Treppen hochsteigen", keywords: ["treppen", "hoch", "hinauf"], next: "turm_zauberer" },
+      { label: "🔔 Die Glocke läuten", keywords: ["glocke", "läuten", "klingeln"], next: "turm_zauberer" }
+    ]
+  },
+
+  turm_zauberer: {
+    icon: "🧙‍♂️",
+    mapStop: 2,
+    gain: { companion: "Magier Alderan", item: "zauberwort" },
+    text: "Oben wartet Magier Alderan, ein alter Zauberer mit sternenübersätem Umhang und funkelnden Augen. \"Willkommen, kleine Abenteurerinnen!\", schmunzelt er und bringt ihnen ein zauberhaftes Wort bei: \"Glitzerlicht!\", das an dunklen Orten hell erstrahlen lässt.",
+    choices: [
+      { label: "➡️ Weiter zum Fluss", keywords: ["weiter", "fluss"], next: "fluss" },
+      { label: "🌟 Sich herzlich bedanken", keywords: ["danke", "bedanken"], next: "fluss" }
+    ]
+  },
+
+  fluss: {
+    icon: "🏞️",
+    mapStop: 3,
+    text: "Am Fluss angekommen, sehen sie einen Biber, der an einem kleinen Steg baut. \"Wollt ihr rüber?\", fragt er freundlich. \"Ich helfe euch, wenn ihr mir ein paar Äste bringt.\" Nebenan plätschert das Wasser einladend flach über ein paar glatte Steine.",
+    choices: [
+      { label: "🪵 Dem Biber Äste bringen", keywords: ["äste", "helfen", "bringen", "biber"], next: "hoehle_dunkel" },
+      { label: "🏊 Selbst über die Steine waten", keywords: ["schwimmen", "waten", "durchqueren", "selbst"], next: "fluss_nass" }
+    ]
+  },
+
+  fluss_nass: {
+    icon: "💦",
+    mapStop: 3,
+    text: "Emma und Pia hüpfen von Stein zu Stein - bis Pia mit einem Fuß ins kühle Wasser rutscht und laut lachen muss. Klatschnass, aber bester Laune erreichen sie das andere Ufer.",
+    choices: [
+      { label: "🐸 Kichernd weiterwaten", keywords: ["kichern", "weiter", "waten"], next: "hoehle_dunkel" },
+      { label: "💦 Sich kurz abschütteln", keywords: ["abschütteln", "trocknen", "weiter"], next: "hoehle_dunkel" }
+    ]
+  },
+
+  hoehle_dunkel: {
+    icon: "🦇",
+    mapStop: 4,
+    text: "Hinter dem Fluss führt der Weg direkt in eine schmale, dunkle Höhle. Von drinnen hallt ein leises Flattern - Fledermäuse! - und die Dunkelheit wirkt auf einmal ziemlich tief. Emma greift fest nach Pias Hand.",
+    choices: [
+      { label: "💎 Den Leuchtstein hervorholen", keywords: ["leuchtstein", "stein", "licht"], next: "hoehle_ende", requiresItem: "leuchtstein" },
+      { label: "✨ 'Glitzerlicht!' rufen", keywords: ["glitzerlicht", "zauberwort", "zauber"], next: "hoehle_ende", requiresItem: "zauberwort" },
+      { label: "🍀 Das Kleeblatt leuchten lassen", keywords: ["kleeblatt", "klee", "leuchten"], next: "hoehle_ende", requiresItem: "kleeblatt" },
+      { label: "🤝 Sich an den Händen festhalten", keywords: ["hände", "festhalten", "zusammen"], next: "hoehle_ende" },
+      { label: "🎵 Ein Mutlied singen", keywords: ["singen", "lied", "mutig", "mut"], next: "hoehle_ende" }
+    ]
+  },
+
+  hoehle_ende: {
+    icon: "🌟",
+    mapStop: 4,
+    text: "Ganz plötzlich wird es hell, und die Dunkelheit verliert ihren Schrecken - die Fledermäuse zwitschern jetzt fast fröhlich mit. Am Ende des Ganges schimmert schon Tageslicht durch einen Spalt in den Felsen.",
+    choices: [
+      { label: "➡️ Weiter zur Drachenhöhle", keywords: ["weiter", "drache", "höhle"], next: "hoehle_eingang" },
+      { label: "🐾 Vorsichtig weiterschleichen", keywords: ["schleichen", "vorsichtig", "weiter"], next: "hoehle_eingang" }
+    ]
+  },
+
+  hoehle_eingang: {
+    icon: "⛰️",
+    mapStop: 5,
+    text: "Der Gang endet vor einem großen Felsen, und darin liegt der Eingang zur Drachenhöhle. Ein leises Schnarchen hallt von drinnen herüber.",
+    choices: [
+      { label: "🤫 Leise hineinschleichen", keywords: ["leise", "schleichen", "still"], next: "drache_schlafend" },
+      { label: "📣 Fröhlich Hallo rufen", keywords: ["rufen", "hallo", "laut"], next: "drache_wach" }
+    ]
+  },
+
+  drache_schlafend: {
+    icon: "😴",
+    mapStop: 5,
+    text: "Ganz leise schleichen Emma und Pia in die Höhle. Dort liegt ein großer, freundlich aussehender Drache und schnarcht friedlich vor sich hin. Pia kichert leise, und der Drache öffnet ein Auge.",
+    choices: [
+      { label: "😊 Vorsichtig Hallo sagen", keywords: ["hallo", "vorsichtig", "wecken"], next: "drache_treffen" },
+      { label: "🪶 Sanft eine Feder hinlegen", keywords: ["feder", "geschenk", "hinlegen"], next: "drache_treffen" }
+    ]
+  },
+
+  drache_wach: {
+    icon: "👋",
+    mapStop: 5,
+    text: "\"Hallooo!\", rufen Emma und Pia fröhlich in die Höhle. Sofort hebt ein großer, bunt schillernder Drache den Kopf und lächelt verschmitzt. \"Na endlich Besuch!\", brummt er freundlich.",
+    choices: [
+      { label: "😊 Näherkommen", keywords: ["näher", "kommen", "hallo"], next: "drache_treffen" },
+      { label: "🙋 Fröhlich zurückwinken", keywords: ["winken", "fröhlich", "hallo"], next: "drache_treffen" }
+    ]
+  },
+
+  drache_treffen: {
+    icon: "🐉",
+    mapStop: 5,
+    gain: { companion: "Fu der Drache" },
+    text: "Der Drache stellt sich als Fu vor. Er bewacht schon lange einen Schatz in seiner Höhle, aber er ist auch ziemlich einsam hier oben in den Bergen. Er schaut Emma und Pia neugierig an.",
+    choices: [
+      { label: "💬 Fu Geschichten erzählen", keywords: ["erzählen", "geschichte", "reden", "sprechen"], next: "schatz_wahl" },
+      { label: "❓ Nach dem Schatz fragen", keywords: ["schatz", "fragen", "frag"], next: "schatz_wahl" }
+    ]
+  },
+
+  schatz_wahl: {
+    icon: "🎉",
+    mapStop: 5,
+    text: "Fu lacht so herzlich, dass kleine Rauchringe aus seiner Nase steigen. \"Ihr seid mir sympathisch!\", sagt er. \"Kommt mit, ich zeig euch meinen Schatz - den teile ich gerne mit echten Freunden.\"",
+    choices: [
+      { label: "✨ Dem Drachen folgen", keywords: ["folgen", "mitkommen", "schatz"], next: "schatzhoehle" },
+      { label: "🎶 Vor Freude tanzend folgen", keywords: ["tanzen", "folgen", "freude"], next: "schatzhoehle" }
+    ]
+  },
+
+  schatzhoehle: {
+    icon: "💰",
+    mapStop: 6,
+    text: "Hinter einem großen Felsen glitzert eine Schatzkiste voller goldener Münzen, funkelnder Steine und einer kleinen Spieluhr. Fu schenkt Emma und Pia je einen glitzernden Stein, der so groß wie ihre Hand ist.",
+    choices: [
+      { label: "🥳 Weiter feiern", keywords: ["feiern", "weiter", "fest"], next: "ende_wahl" },
+      { label: "💰 Die Schätze noch kurz bestaunen", keywords: ["schätze", "bestaunen", "anschauen"], next: "ende_wahl" }
+    ]
+  },
+
+  ende_wahl: {
+    icon: "🎊",
+    mapStop: 6,
+    text: "Fu grinst verschmitzt. \"Und, wo wollt ihr euren Erfolg feiern?\", fragt er.",
+    choices: [
+      { label: "🏰 Fest im Schloss", keywords: ["schloss", "fest", "ritter"], next: "ende_schloss", requiresCompanion: "Ritter Finn" },
+      { label: "🗼 Sternenfest im Turm", keywords: ["turm", "fest", "zauberer", "stern"], next: "ende_turm", requiresCompanion: "Magier Alderan" },
+      { label: "🧺 Picknick mit dem Drachen", keywords: ["picknick", "drache", "fest"], next: "ende_drache" }
+    ]
+  },
+
+  ende_schloss: {
+    icon: "🏰",
+    mapStop: 7,
+    isEnd: true,
+    text: "Zurück im Schloss wird ein großes Fest gefeiert! Ritter Finn lässt bunte Fahnen wehen, es gibt Kuchen und Musik, und Fu passt zwischen den Torbögen gerade so hindurch. Mit dabei sind {companions}. Glücklich und mit ihrem funkelnden Schatz in der Tasche kuscheln sich Emma und Pia am Abend müde in ihre Betten. ENDE ❤️",
+    choices: []
+  },
+
+  ende_turm: {
+    icon: "🎆",
+    mapStop: 7,
+    isEnd: true,
+    text: "Im Zauberturm lässt Magier Alderan bunte Funken wie ein kleines Feuerwerk in den Nachthimmel steigen, während Fu genüsslich mitdampft. Mit dabei sind {companions}. Emma und Pia lachen, tanzen im Glitzerregen und machen sich am Ende überglücklich mit ihrem Schatz auf den Heimweg. ENDE ❤️",
+    choices: []
+  },
+
+  ende_drache: {
+    icon: "🏡",
+    mapStop: 7,
+    isEnd: true,
+    text: "Emma, Pia und Fu setzen sich vor die Höhle und picknicken zusammen, während die Sonne golden über den Bergen untergeht. Mit dabei sind {companions}. Mit ihren glitzernden Schätzen in der Tasche und vielen neuen Freunden machen sich Emma und Pia glücklich auf den Heimweg. ENDE ❤️",
+    choices: []
+  }
+};
+
+const mapLabels = ["Start", "Wald", "Freunde", "Fluss", "Höhle", "Drache", "Schatz", "Fest"];
+
+let currentNode = "start";
+let autoRead = true;
+let companions = [];
+let items = new Set();
+
+/* ---------- Fortschritt (Begleiter & Gegenstände) ---------- */
+function applyGain(source){
+  if(!source.gain) return;
+  if(source.gain.companion && !companions.includes(source.gain.companion)){
+    companions.push(source.gain.companion);
+  }
+  if(source.gain.item){
+    items.add(source.gain.item);
+  }
+}
+
+function formatCompanions(){
+  if(companions.length === 0) return "ihren neuen Freunden";
+  if(companions.length === 1) return companions[0];
+  return companions.slice(0, -1).join(", ") + " und " + companions[companions.length - 1];
+}
+
+function getVisibleChoices(node){
+  return node.choices.filter(choice =>
+    (!choice.requiresItem || items.has(choice.requiresItem)) &&
+    (!choice.requiresCompanion || companions.includes(choice.requiresCompanion))
+  );
+}
+
+/* ---------- Rendering ---------- */
+function renderScene(nodeId){
+  currentNode = nodeId;
+  const node = story[nodeId];
+  applyGain(node);
+
+  document.getElementById("sceneIcon").textContent = node.icon;
+  document.getElementById("sceneText").textContent = node.text.replace(/\{companions\}/g, formatCompanions());
+
+  const visibleChoices = getVisibleChoices(node);
+
+  const choicesEl = document.getElementById("choices");
+  choicesEl.innerHTML = "";
+  visibleChoices.forEach(choice => {
+    const btn = document.createElement("button");
+    btn.className = "choice-btn";
+    btn.textContent = choice.label;
+    btn.addEventListener("click", () => { applyGain(choice); renderScene(choice.next); });
+    choicesEl.appendChild(btn);
+  });
+
+  const typeArea = document.getElementById("typeArea");
+  const restartBtn = document.getElementById("restartBtn");
+  document.getElementById("typeHint").textContent = "";
+  document.getElementById("typeInput").value = "";
+
+  if(node.isEnd){
+    typeArea.style.display = "none";
+    restartBtn.style.display = "block";
+  } else {
+    typeArea.style.display = "flex";
+    restartBtn.style.display = "none";
+  }
+
+  renderMap(node.mapStop);
+
+  if(autoRead){
+    speak(document.getElementById("sceneText").textContent);
+  }
+}
+
+function renderMap(activeStop){
+  const mapEl = document.getElementById("map");
+  mapEl.innerHTML = "";
+  mapLabels.forEach((label, i) => {
+    const stop = document.createElement("div");
+    stop.className = "map-stop" + (i <= activeStop ? " done" : "");
+    stop.innerHTML = "👣<span>" + label + "</span>";
+    mapEl.appendChild(stop);
+  });
+}
+
+/* ---------- Texteingabe mit Keyword-Matching ---------- */
+function normalize(str){
+  return str.toLowerCase().trim().replace(/[.,!?]/g, "");
+}
+
+function handleTypeSubmit(){
+  const input = normalize(document.getElementById("typeInput").value);
+  const hintEl = document.getElementById("typeHint");
+  if(!input){ return; }
+
+  const node = story[currentNode];
+  const match = getVisibleChoices(node).find(choice =>
+    choice.keywords.some(kw => input.includes(kw))
+  );
+
+  if(match){
+    applyGain(match);
+    renderScene(match.next);
+  } else {
+    hintEl.textContent = "Hmm, das kenn ich nicht. Versuch's nochmal oder klick einen Knopf!";
+  }
+}
+
+document.getElementById("typeSubmit").addEventListener("click", handleTypeSubmit);
+document.getElementById("typeInput").addEventListener("keydown", e => {
+  if(e.key === "Enter") handleTypeSubmit();
+});
+
+document.getElementById("restartBtn").addEventListener("click", () => {
+  companions = [];
+  items = new Set();
+  renderScene("start");
+});
+
+/* ---------- Sprachausgabe (Web Speech API) ---------- */
+let germanVoices = [];
+let selectedVoice = null;
+let speechRate = 1.0;
+let currentUtterance = null; // globale Referenz gegen GC-Abbruch auf Android
+let resumeInterval = null;   // Workaround gegen pausierte Queue auf iOS
+
+function loadVoices(){
+  const all = speechSynthesis.getVoices();
+  germanVoices = all.filter(v => v.lang.toLowerCase().startsWith("de"));
+
+  const select = document.getElementById("voiceSelect");
+  select.innerHTML = "";
+
+  if(germanVoices.length === 0){
+    const opt = document.createElement("option");
+    opt.textContent = "Keine deutsche Stimme gefunden";
+    select.appendChild(opt);
+    selectedVoice = null;
+    return;
+  }
+
+  germanVoices.forEach((v, i) => {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = v.name + " (" + v.lang + ")";
+    select.appendChild(opt);
+  });
+  selectedVoice = germanVoices[0];
+}
+
+if("speechSynthesis" in window){
+  speechSynthesis.onvoiceschanged = loadVoices;
+  loadVoices();
+} else {
+  document.getElementById("autoReadBtn").disabled = true;
+  document.getElementById("readNowBtn").disabled = true;
+}
+
+document.getElementById("voiceSelect").addEventListener("change", e => {
+  selectedVoice = germanVoices[e.target.value];
+});
+
+document.getElementById("rateSlider").addEventListener("input", e => {
+  speechRate = parseFloat(e.target.value);
+});
+
+function speak(text){
+  if(!("speechSynthesis" in window)) return;
+
+  speechSynthesis.cancel();
+  if(resumeInterval){ clearInterval(resumeInterval); resumeInterval = null; }
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "de-DE";
+  utterance.rate = speechRate;
+  if(selectedVoice) utterance.voice = selectedVoice;
+
+  currentUtterance = utterance; // hält die Referenz, verhindert Abbruch durch Garbage Collection
+
+  utterance.onend = () => {
+    if(resumeInterval){ clearInterval(resumeInterval); resumeInterval = null; }
+    currentUtterance = null;
+  };
+
+  speechSynthesis.speak(utterance);
+
+  // iOS pausiert die Sprachausgabe manchmal von selbst nach ein paar Sekunden
+  resumeInterval = setInterval(() => {
+    if(speechSynthesis.speaking && speechSynthesis.paused){
+      speechSynthesis.resume();
+    }
+  }, 500);
+}
+
+const autoReadBtn = document.getElementById("autoReadBtn");
+autoReadBtn.classList.add("active");
+autoReadBtn.addEventListener("click", () => {
+  autoRead = !autoRead;
+  autoReadBtn.textContent = autoRead ? "🔊 Vorlesen: an" : "🔇 Vorlesen: aus";
+  autoReadBtn.classList.toggle("active", autoRead);
+});
+
+document.getElementById("readNowBtn").addEventListener("click", () => {
+  speak(story[currentNode].text);
+});
+
+/* ---------- Start ---------- */
+renderScene("start");
+</script>
+
+</body>
+</html>
